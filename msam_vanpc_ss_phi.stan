@@ -34,8 +34,8 @@ data {
   array [R,S] int <lower=0> y1; // Counts in season 1
   array [R,J,S] int<lower=0> y2; // counts in season 2
   int<lower=0> K;       // Upper bound of population size
-  array [R,C,H] real E1;      // environmental covariates in season 1
-  array [R,C,H] real E2;       // environmental covariates in season 2 
+  array [R] matrix[C,H] E1;      // environmental covariates in season 1
+  array [R] matrix [C,H] E2;       // environmental covariates in season 2 
 }
 
 transformed data {
@@ -47,12 +47,12 @@ transformed data {
       max_y2[i,j] = max(y2[i,,j]); 
   }
   
-  array [R] matrix [C,H] E1_arr; 
-  array [R] matrix [C,H] E2_arr;  
-  for (j in 1:R){
-        E1_arr[j] = to_matrix(E1[j,:,:]);
-        E2_arr[j] = to_matrix(E2[j,:,:]);
-    }
+//   array [R] matrix [C,H] E1_arr; 
+//   array [R] matrix [C,H] E2_arr;  
+//   for (j in 1:R){
+//         E1_arr[j] = to_matrix(E1[j,:,:]);
+//         E2_arr[j] = to_matrix(E2[j,:,:]);
+//     }
 }
 
 
@@ -119,7 +119,7 @@ model {
       vector[K - max_y2[i,s] + 1] lp2; //it's the product, lambda*p that's calculated
         
       for (j in 1:(K - max_y2[i,s] + 1)){
-           lp2[j] = poisson_log_lpmf(max_y2[i,s] + j - 1 | scale_select(zeta[s],E2_arr[i])*beta[,s] + phi[s]*scale_select(zeta[s],E1_arr[i])*beta[,s]) 
+           lp2[j] = poisson_log_lpmf(max_y2[i,s] + j - 1 | scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*scale_select(zeta[s],E1[i])*beta[,s]) 
                + binomial_lpmf(y2[i,,s] | max_y2[i,s] + j - 1, p[s]); // implicitly sums across T (y[i] is vectorized)
       }
       target += log_sum_exp(lp2);
@@ -127,7 +127,7 @@ model {
       vector[K - max_y1[i,s] + 1] lp1;
 
             for (j in 1:(K - max_y1[i,s] + 1)){
-           lp1[j] = poisson_log_lpmf(max_y1[i,s] + j - 1 |scale_select(zeta[s],E1_arr[i])*beta[,s]) 
+           lp1[j] = poisson_log_lpmf(max_y1[i,s] + j - 1 |scale_select(zeta[s],E1[i])*beta[,s]) 
                + binomial_lpmf(y1[i,s] | max_y1[i,s] + j - 1, p[s]); // implicitly sums across T (y[i] is vectorized)
       }
       target += log_sum_exp(lp1);
@@ -142,8 +142,8 @@ generated quantities{
 
   for (i in 1:R){
     for (s in 1:S){
-      N1[i,s] = poisson_log_rng(scale_select(zeta[s],E1_arr[i])*beta[,s]);
-      N2[i,s] = poisson_log_rng(scale_select(zeta[s],E1_arr[i])*beta[,s] + phi[s]*scale_select(zeta[s],E1_arr[i])*beta[,s]);
+      N1[i,s] = poisson_log_rng(scale_select(zeta[s],E1[i])*beta[,s]);
+      N2[i,s] = poisson_log_rng(scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*scale_select(zeta[s],E2[i])*beta[,s]);
     }
   }
 }
