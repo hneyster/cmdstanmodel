@@ -119,7 +119,7 @@ model {
       vector[K - max_y2[i,s] + 1] lp2; //it's the product, lambda*p that's calculated
         
       for (j in 1:(K - max_y2[i,s] + 1)){
-           lp2[j] = poisson_log_lpmf(max_y2[i,s] + j - 1 | scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*scale_select(zeta[s],E1[i])*beta[,s]) 
+           lp2[j] = poisson_log_lpmf(max_y2[i,s] + j - 1 | scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*(scale_select(zeta[s],E1[i])*beta[,s])) 
                + binomial_lpmf(y2[i,,s] | max_y2[i,s] + j - 1, p[s]); // implicitly sums across T (y[i] is vectorized)
       }
       target += log_sum_exp(lp2);
@@ -143,7 +143,7 @@ generated quantities{
   for (i in 1:R){
     for (s in 1:S){
       N1[i,s] = poisson_log_rng(scale_select(zeta[s],E1[i])*beta[,s]);
-      N2[i,s] = poisson_log_rng(scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*scale_select(zeta[s],E2[i])*beta[,s]);
+      N2[i,s] = poisson_log_rng(scale_select(zeta[s],E2[i])*beta[,s] + phi[s]*(scale_select(zeta[s],E1[i])*beta[,s]));
     }
   }
 }

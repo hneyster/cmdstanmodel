@@ -102,8 +102,8 @@ generated quantities{
 
   for (i in 1:R){
     for (s in 1:S){
-      N1[i,s] = poisson_log_rng(E2[i,]*beta[,s] + phi[s]*(E1[i,]*beta[,s]));
-      N2[i,s] = poisson_log_rng(E2[i,]*beta[,s]);
+      N1[i,s] = poisson_log_rng(E1[i,]*beta[,s]);
+      N2[i,s] = poisson_log_rng(E2[i,]*beta[,s] + phi[s]*(E1[i,]*beta[,s]));
 
       //PPC[i,s] = binomial_rng (N[i,s], p[s] ) ;
     }
