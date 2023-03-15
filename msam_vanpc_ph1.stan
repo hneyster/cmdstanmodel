@@ -72,7 +72,7 @@ model {
   rho ~ normal(0,4);
   sigma ~ normal(0,5);
   
-  phi ~ normal(rho1, sigma1);
+  phi ~ normal(rho, sigma);
   //phi2 ~ normal(rho2, sigma2);
 
   p ~ beta(theta*psi, theta*(1-psi));
@@ -109,7 +109,7 @@ generated quantities{
 
   for (i in 1:R){
     for (s in 1:S){
-      N1[i,s] = poisson_log_rng(E1[i,]*beta[,s];
+      N1[i,s] = poisson_log_rng(E1[i,]*beta[,s]);
       N2[i,s] = poisson_log_rng(E2[i,]*beta[,s]*phi[s]);
 
       //PPC[i,s] = binomial_rng (N[i,s], p[s] ) ;
