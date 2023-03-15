@@ -19,7 +19,7 @@ data {
 transformed data {
   int<lower=0> max_y2[R,S]; // the the max number of each sp observed at each spatial replication.
   int<lower=0> max_y1[R,S];
-  max_y1 = y1; # no temporal replication, so it is the max 
+  max_y1 = y1; // no temporal replication, so it is the max 
   for (i in 1:R) {
     for (j in 1:S)
       max_y2[i,j] = max(y2[i,,j]); 
@@ -33,7 +33,7 @@ parameters {
     vector<lower=0>[H] tau;
     matrix [H,S] beta_tilde; // centered habitat weights 
     vector <lower=0,upper=1> [S] p;  // centered detection variation by species 
-    vector [S] phi; 
+    vector [S] phi_tilde;
     real rho;
     real <lower=0> sigma; 
     //vector [S] phi2; 
@@ -42,15 +42,16 @@ parameters {
     
 }
 transformed parameters{
+  vector [S] phi;
   matrix[H,S] beta; // habitat sensitivity by species 
   for (i in 1:H){
     for (j in 1:S){
     beta[i,j] = mu[i]+tau[i]*beta_tilde[i,j];
+    phi[j] = rho + sigma*phi_tilde[j];
   //implies habitat ~ normal(mu_habitat, sig_habitat
     }
   }
   // implies p ~ logistic(mu_p, sig_p)
-   
 }
 
 model {
@@ -72,12 +73,13 @@ model {
   rho ~ normal(0,4);
   sigma ~ normal(0,5);
   
-  phi ~ normal(rho, sigma);
+  //phi ~ normal(rho, sigma);
   //phi2 ~ normal(rho2, sigma2);
 
   p ~ beta(theta*psi, theta*(1-psi));
 
   to_vector(beta_tilde) ~ std_normal(); //implies habitat ~ normal(mu, tau)
+  to_vector(phi_tilde) ~ std_normal();
 
   // Likelihood
   for (i in 1:R) {
