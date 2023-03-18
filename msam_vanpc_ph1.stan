@@ -57,7 +57,7 @@ transformed parameters{
 model {
   // Priors
   // priors on beta:
-  mu[1] ~ normal(-2,2); //water 
+  mu[1] ~ normal(-3,1); //water; based on mu1[1] from model with only year 2 
   mu[2] ~ normal(-3,2); //buildings
   mu[3] ~ normal(-3,2); //paved
   mu[4] ~ normal(-2,2); //barren
@@ -77,7 +77,7 @@ model {
   //phi2 ~ normal(rho2, sigma2);
 
   p ~ beta(theta*psi, theta*(1-psi));
-
+  p[7] ~ normal(0.57, 0.05); // based on p[7] from model with only year 2
   to_vector(beta_tilde) ~ std_normal(); //implies habitat ~ normal(mu, tau)
   to_vector(phi_tilde) ~ std_normal();
 
