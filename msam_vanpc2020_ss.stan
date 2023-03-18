@@ -6,19 +6,20 @@
 functions {
   row_vector scale_select(real zeta, matrix E) {
     int C = cols(E);
+    real zeta_trans = zeta*(C-1)+ 1; //translating zeta  from 0,1 to 1,30 
     int index = cols(E);
     
     // If zeta is already above the maximum index then
     // we can skip the interpolation
-    if (index < zeta*C) {
+    if (index < zeta_trans) {
       return E[index,:];
     }
     
-    while (index > zeta*C) {
+    while (index > zeta_trans) {
       index -= 1;
     }
     
-    real prop_scales = zeta*C - index;
+    real prop_scales = zeta_trans - index;
     
     // Assumes same value of zeta for every row
     return E[index,:] * (1 - prop_scales) + E[index + 1,:] * prop_scales;
@@ -44,7 +45,7 @@ transformed data {
 }
 
 parameters {
-    vector <lower=1.0/C, upper = 1>[S] zeta;
+    vector <lower=0, upper = 1>[S] zeta;
     real <lower=0, upper=1> psi;
     real<lower=1.0/C,upper=1> kappa;
     real <lower=0> theta;
