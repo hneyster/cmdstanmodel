@@ -23,6 +23,7 @@ transformed data {
   for (i in 1:S){
    for (j in 1: H){
      E2_opt[:,i,j] = E2[,opt[i,j],j];
+     E2_opt[:,i,j+1] = rep_array(1,R);
    }
   }
 }
@@ -30,9 +31,9 @@ transformed data {
 parameters {
     real <lower=0, upper=1> psi;       // 
     real <lower=0> theta; // 
-    vector[H] mu;
-    vector<lower=0>[H] tau;
-    matrix [H,S] beta_tilde; // centered habitat weights 
+    vector[H+1] mu;
+    vector<lower=0>[H+1] tau;
+    matrix [H+1,S] beta_tilde; // centered habitat weights 
     vector <lower=0,upper=1> [S] p;  // centered detection variation by species 
     //vector [S] phi2; 
     //real rho2;
@@ -41,7 +42,7 @@ parameters {
 }
 transformed parameters{
   matrix[H,S] beta; // habitat sensitivity by species 
-  for (i in 1:H){
+  for (i in 1:(H+1)){
     for (j in 1:S){
     beta[i,j] = mu[i]+tau[i]*beta_tilde[i,j];
   //implies habitat ~ normal(mu_habitat, sig_habitat
@@ -52,6 +53,7 @@ transformed parameters{
 
 model {
   // Priors
+  
   // priors on beta:
   mu[1] ~ normal(-2,2); //water 
   mu[2] ~ normal(-3,2); //buildings
@@ -59,6 +61,8 @@ model {
   mu[4] ~ normal(-2,2); //barren
   mu[5] ~ normal(-2,2); // grass-herb
   mu[6] ~ normal(-2,2); // coniferous 
+  mu[7] ~ normal(-2,2); 
+  mu[8] ~ normal(-5,5); //intercept
   tau ~ normal(5, 10);
   
   //priors on p:
@@ -73,7 +77,6 @@ model {
   p ~ beta(theta*psi, theta*(1-psi));
 
   to_vector(beta_tilde) ~ std_normal(); //implies habitat ~ normal(mu, tau)
-
   // Likelihood
   for (i in 1:R) {
     for (s in 1:S){ 
