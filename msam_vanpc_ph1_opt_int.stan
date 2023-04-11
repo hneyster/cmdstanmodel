@@ -23,7 +23,7 @@ data {
 transformed data {
   array [R,S] int<lower=0> max_y2; // the the max number of each sp observed at each spatial replication.
   array [R,S] int<lower=0> max_y1;
-  max_y1 = y1; # no temporal replication, so it is the max 
+  max_y1 = y1; // no temporal replication, so it is the max 
   for (i in 1:R) {
     for (j in 1:S)
       max_y2[i,j] = max(y2[i,,j]); 
@@ -32,8 +32,8 @@ transformed data {
   array [R] matrix[S,H+1]  E2_opt;
   for (i in 1:S){
    for (j in 1: H){
-     E1_opt[:,i,j] = to_array_1d((to_row_vector(E1[,opt[i,j],j]) - mean(E1[,opt[i,j],j])/sd(E1[,opt[i,j],j])));
-     E2_opt[:,i,j] = to_array_1d((to_row_vector(E2[,opt[i,j],j]) - mean(E2[,opt[i,j],j])/sd(E1[,opt[i,j],j])));
+     E1_opt[:,i,j] = to_array_1d((to_row_vector(E1[,opt[i,j],j]) - mean(E1[,opt[i,j],j]))/sd(E1[,opt[i,j],j]));
+     E2_opt[:,i,j] = to_array_1d((to_row_vector(E2[,opt[i,j],j]) - mean(E2[,opt[i,j],j]))/sd(E1[,opt[i,j],j]));
      E1_opt[:,i,H+1] = rep_array(1,R);
      E2_opt[:,i,H+1] = rep_array(1,R);
 
