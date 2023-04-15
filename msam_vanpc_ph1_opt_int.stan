@@ -5,7 +5,7 @@
 // added 1997 bird observations 
 // added phi, but as a multiplyer 
 // adding optimum scales
-// adding intercept, and standardizing variables 
+// adding intercept
 data {
   int<lower=0> R;       // Number of sites in season 1
   int<lower=0> J;       // Number of temporal replicates in season 2
@@ -32,8 +32,8 @@ transformed data {
   array [R] matrix[S,H+1]  E2_opt;
   for (i in 1:S){
    for (j in 1: H){
-     E1_opt[:,i,j] = to_array_1d((to_row_vector(E1[,opt[i,j],j]) - mean(E1[,opt[i,j],j]))/sd(E1[,opt[i,j],j]));
-     E2_opt[:,i,j] = to_array_1d((to_row_vector(E2[,opt[i,j],j]) - mean(E2[,opt[i,j],j]))/sd(E1[,opt[i,j],j]));
+     E1_opt[:,i,j] = to_array_1d(E1[,opt[i,j],j]);
+     E2_opt[:,i,j] = to_array_1d(E2[,opt[i,j],j]);
      E1_opt[:,i,H+1] = rep_array(1,R);
      E2_opt[:,i,H+1] = rep_array(1,R);
 
